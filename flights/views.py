@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from .models import Flight,Passengers
 from django.urls import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect,HttpResponseNotFound
+from django.core.exceptions import ObjectDoesNotExist
 # Create your views here.
 def index(request):
     return render(request, "flights/index.html",{
@@ -9,7 +10,10 @@ def index(request):
     })
 
 def flight(request,flight_id):
-    flight=Flight.objects.get(pk=flight_id)
+    try:
+        flight=Flight.objects.get(pk=flight_id)
+    except ObjectDoesNotExist:
+         return HttpResponseNotFound('Flight not found.', status=404)
     return render(request,"flights/flight.html",{
         "flight": flight,
         "passengers":flight.passengers.all(),
